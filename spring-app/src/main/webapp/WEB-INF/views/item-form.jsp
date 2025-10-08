@@ -5,7 +5,21 @@
     <title>Report Item</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-gray-50 min-h-screen flex items-center justify-center">
+<body class="bg-gray-50 min-h-screen">
+    <nav class="bg-gray-800 text-white shadow-lg">
+        <div class="max-w-7xl mx-auto px-4 py-4">
+            <div class="flex justify-between items-center">
+                <div class="text-xl font-bold">Lost & Found</div>
+                <div class="space-x-6">
+                    <a href="/" class="hover:text-blue-400">Home</a>
+                    <a href="/items" class="hover:text-blue-400">Items</a>
+                    <a href="/complaints" class="hover:text-blue-400">Complaints</a>
+                    <button onclick="logout()" class="hover:text-blue-400">Logout</button>
+                </div>
+            </div>
+        </div>
+    </nav>
+    <div class="flex items-center justify-center min-h-[calc(100vh-72px)]">
     <div class="bg-white p-8 rounded-lg shadow-lg w-full max-w-2xl">
         <h2 class="text-3xl font-bold text-gray-900 mb-6">Report Lost/Found Item</h2>
         <form id="itemForm" class="space-y-4">
@@ -58,6 +72,10 @@
                 alert('Failed to submit item');
             }
         });
+        function logout() {
+            localStorage.removeItem('token');
+            window.location.href = '/login';
+        }
     </script>
 </body>
 </html>

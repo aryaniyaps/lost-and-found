@@ -10,12 +10,10 @@
         <div class="max-w-7xl mx-auto px-4 py-4">
             <div class="flex justify-between items-center">
                 <div class="text-xl font-bold">Lost & Found</div>
-                <div class="space-x-6">
+                <div class="space-x-6" id="navLinks">
                     <a href="/" class="hover:text-blue-400">Home</a>
                     <a href="/items" class="hover:text-blue-400">Items</a>
                     <a href="/complaints" class="hover:text-blue-400">Complaints</a>
-                    <a href="/login" class="hover:text-blue-400">Login</a>
-                    <a href="/register" class="hover:text-blue-400">Register</a>
                 </div>
             </div>
         </div>
@@ -31,7 +29,14 @@
         </div>
     </div>
     <script>
-        if (!localStorage.getItem('token')) {
+        const nav = document.getElementById('navLinks');
+        if (localStorage.getItem('token')) {
+            nav.innerHTML += '<button onclick="logout()" class="hover:text-blue-400">Logout</button>';
+        } else {
+            nav.innerHTML += '<a href="/login" class="hover:text-blue-400">Login</a><a href="/register" class="hover:text-blue-400">Register</a>';
+        }
+        function logout() {
+            localStorage.removeItem('token');
             window.location.href = '/login';
         }
     </script>

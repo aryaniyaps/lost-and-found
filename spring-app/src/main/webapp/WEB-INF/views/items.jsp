@@ -14,6 +14,7 @@
                     <a href="/" class="hover:text-blue-400">Home</a>
                     <a href="/items" class="hover:text-blue-400">Items</a>
                     <a href="/complaints" class="hover:text-blue-400">Complaints</a>
+                    <button onclick="logout()" class="hover:text-blue-400">Logout</button>
                 </div>
             </div>
         </div>
@@ -35,27 +36,34 @@
             window.location.href = '/login';
         }
         async function loadItems(type) {
-            const url = type ? `/api/items?type=${type}` : '/api/items';
+            const url = type ? '/api/items?type=' + type : '/api/items';
             const res = await fetch(url, {
                 headers: {'Authorization': 'Bearer ' + localStorage.getItem('token')}
             });
+            if (!res.ok) return;
             const items = await res.json();
-            document.getElementById('items').innerHTML = items.map(item => `
-                <div class="bg-white rounded-lg shadow-md p-6 border-l-4 ${item.type === 'LOST' ? 'border-red-500' : 'border-green-500'}">
-                    <h3 class="text-xl font-bold text-gray-900 mb-2">${item.title}</h3>
-                    <p class="text-gray-600 mb-4">${item.description || 'No description'}</p>
-                    <div class="space-y-2 text-sm">
-                        <p><span class="font-semibold">Category:</span> ${item.category}</p>
-                        <p><span class="font-semibold">Location:</span> ${item.location || 'N/A'}</p>
-                        <div class="flex gap-2 mt-3">
-                            <span class="px-3 py-1 rounded-full text-xs font-semibold ${item.type === 'LOST' ? 'bg-red-100 text-red-800' : 'bg-green-100 text-green-800'}">${item.type}</span>
-                            <span class="px-3 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-800">${item.status}</span>
-                        </div>
-                    </div>
-                </div>
-            `).join('');
+            document.getElementById('items').innerHTML = items.map(item => {
+                const borderColor = item.type === 'LOST' ? 'border-red-500' : 'border-green-500';
+                const typeColor = item.type === 'LOST' ? 'bg-red-100 text-red-800' : 'bg-green-100 text-green-800';
+                return '<div class="bg-white rounded-lg shadow-md p-6 border-l-4 ' + borderColor + '">' +
+                    '<h3 class="text-xl font-bold text-gray-900 mb-2">' + item.title + '</h3>' +
+                    '<p class="text-gray-600 mb-4">' + (item.description || 'No description') + '</p>' +
+                    '<div class="space-y-2 text-sm">' +
+                        '<p><span class="font-semibold">Category:</span> ' + item.category + '</p>' +
+                        '<p><span class="font-semibold">Location:</span> ' + (item.location || 'N/A') + '</p>' +
+                        '<div class="flex gap-2 mt-3">' +
+                            '<span class="px-3 py-1 rounded-full text-xs font-semibold ' + typeColor + '">' + item.type + '</span>' +
+                            '<span class="px-3 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-800">' + item.status + '</span>' +
+                        '</div>' +
+                    '</div>' +
+                '</div>';
+            }).join('');
         }
         loadItems();
+        function logout() {
+            localStorage.removeItem('token');
+            window.location.href = '/login';
+        }
     </script>
 </body>
 </html>

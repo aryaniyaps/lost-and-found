@@ -14,6 +14,7 @@
                     <a href="/" class="hover:text-blue-400">Home</a>
                     <a href="/items" class="hover:text-blue-400">Items</a>
                     <a href="/complaints" class="hover:text-blue-400">Complaints</a>
+                    <button onclick="logout()" class="hover:text-blue-400">Logout</button>
                 </div>
             </div>
         </div>
@@ -37,17 +38,20 @@
             document.getElementById('complaints').innerHTML = complaints.map(c => {
                 const statusColor = c.status === 'RESOLVED' ? 'border-green-500' : c.status === 'OPEN' ? 'border-yellow-500' : 'border-blue-500';
                 const statusBadge = c.status === 'RESOLVED' ? 'bg-green-100 text-green-800' : c.status === 'OPEN' ? 'bg-yellow-100 text-yellow-800' : 'bg-blue-100 text-blue-800';
-                return `
-                    <div class="bg-white rounded-lg shadow-md p-6 border-l-4 ${statusColor}">
-                        <h3 class="text-xl font-bold text-gray-900 mb-2">${c.subject}</h3>
-                        <p class="text-gray-600 mb-4">${c.description}</p>
-                        <span class="px-3 py-1 rounded-full text-xs font-semibold ${statusBadge}">${c.status}</span>
-                        ${c.resolution ? `<p class="mt-4 text-sm text-gray-700"><span class="font-semibold">Resolution:</span> ${c.resolution}</p>` : ''}
-                    </div>
-                `;
+                const resolution = c.resolution ? '<p class="mt-4 text-sm text-gray-700"><span class="font-semibold">Resolution:</span> ' + c.resolution + '</p>' : '';
+                return '<div class="bg-white rounded-lg shadow-md p-6 border-l-4 ' + statusColor + '">' +
+                    '<h3 class="text-xl font-bold text-gray-900 mb-2">' + c.subject + '</h3>' +
+                    '<p class="text-gray-600 mb-4">' + c.description + '</p>' +
+                    '<span class="px-3 py-1 rounded-full text-xs font-semibold ' + statusBadge + '">' + c.status + '</span>' +
+                    resolution +
+                    '</div>';
             }).join('');
         }
         loadComplaints();
+        function logout() {
+            localStorage.removeItem('token');
+            window.location.href = '/login';
+        }
     </script>
 </body>
 </html>
