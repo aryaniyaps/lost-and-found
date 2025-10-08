@@ -13,6 +13,7 @@
                 <div class="space-x-6" id="navLinks">
                     <a href="/" class="hover:text-blue-400">Home</a>
                     <a href="/items" class="hover:text-blue-400">Items</a>
+                    <a href="/dashboard" class="hover:text-blue-400">Dashboard</a>
                     <a href="/complaints" class="hover:text-blue-400">Complaints</a>
                 </div>
             </div>
@@ -33,7 +34,7 @@
         if (localStorage.getItem('token')) {
             nav.innerHTML += '<button onclick="logout()" class="hover:text-blue-400">Logout</button>';
         } else {
-            nav.innerHTML += '<a href="/login" class="hover:text-blue-400">Login</a><a href="/register" class="hover:text-blue-400">Register</a>';
+            nav.innerHTML = '<a href="/" class="hover:text-blue-400">Home</a><a href="/items" class="hover:text-blue-400">Items</a><a href="/login" class="hover:text-blue-400">Login</a><a href="/register" class="hover:text-blue-400">Register</a>';
         }
         function logout() {
             localStorage.removeItem('token');

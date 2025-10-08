@@ -40,4 +40,14 @@ public class ViewController {
     public String newComplaint() {
         return "complaint-form";
     }
+
+    @GetMapping("/dashboard")
+    public String dashboard() {
+        return "dashboard";
+    }
+
+    @GetMapping("/items/{id}")
+    public String itemDetail() {
+        return "item-detail";
+    }
 }

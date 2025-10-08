@@ -13,6 +13,7 @@
                 <div class="space-x-6">
                     <a href="/" class="hover:text-blue-400">Home</a>
                     <a href="/items" class="hover:text-blue-400">Items</a>
+                    <a href="/dashboard" class="hover:text-blue-400">Dashboard</a>
                     <a href="/complaints" class="hover:text-blue-400">Complaints</a>
                     <button onclick="logout()" class="hover:text-blue-400">Logout</button>
                 </div>

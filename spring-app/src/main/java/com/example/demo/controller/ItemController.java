@@ -51,4 +51,19 @@ public class ItemController {
         itemService.deleteItem(id);
         return ResponseEntity.ok(Map.of("message", "Item deleted"));
     }
+
+    @GetMapping("/search")
+    public ResponseEntity<List<Item>> searchItems(@RequestParam String q) {
+        return ResponseEntity.ok(itemService.searchItems(q));
+    }
+
+    @GetMapping("/filter")
+    public ResponseEntity<List<Item>> filterItems(@RequestParam String category) {
+        return ResponseEntity.ok(itemService.filterByCategory(category));
+    }
+
+    @GetMapping("/{id}/matches")
+    public ResponseEntity<List<Item>> findMatches(@PathVariable Long id) {
+        return ResponseEntity.ok(itemService.findMatches(id));
+    }
 }

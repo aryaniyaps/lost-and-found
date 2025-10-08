@@ -54,4 +54,18 @@ public class ItemService {
     public void deleteItem(Long id) {
         itemRepository.deleteById(id);
     }
+
+    public List<Item> searchItems(String query) {
+        return itemRepository.searchItems(query);
+    }
+
+    public List<Item> filterByCategory(String category) {
+        return itemRepository.findByCategory(category);
+    }
+
+    public List<Item> findMatches(Long itemId) {
+        Item item = getItemById(itemId);
+        Item.ItemType oppositeType = item.getType() == Item.ItemType.LOST ? Item.ItemType.FOUND : Item.ItemType.LOST;
+        return itemRepository.findPotentialMatches(oppositeType, item.getCategory(), item.getTitle());
+    }
 }

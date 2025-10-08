@@ -7,4 +7,6 @@ import java.util.List;
 public interface ComplaintRepository extends JpaRepository<Complaint, Long> {
     List<Complaint> findByUserId(Long userId);
     List<Complaint> findByStatus(Complaint.ComplaintStatus status);
+    long countByUserId(Long userId);
+    long countByUserIdAndStatus(Long userId, Complaint.ComplaintStatus status);
 }
