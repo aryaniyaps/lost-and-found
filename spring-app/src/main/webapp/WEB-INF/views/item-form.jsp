@@ -23,7 +23,7 @@
     <div class="flex items-center justify-center min-h-[calc(100vh-72px)]">
     <div class="bg-white p-8 rounded-lg shadow-lg w-full max-w-2xl">
         <h2 class="text-3xl font-bold text-gray-900 mb-6">Report Lost/Found Item</h2>
-        <form id="itemForm" class="space-y-4">
+        <form id="itemForm" class="space-y-4" action="${pageContext.request.contextPath}/submitReport" method="post" enctype="multipart/form-data">
             <div>
                 <input type="text" name="title" placeholder="Item Title" required 
                     class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
@@ -47,6 +47,10 @@
             <div>
                 <input type="text" name="location" placeholder="Location" 
                     class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+            </div>
+            <div class="form-group">
+                <label for="imageFile">Upload Image:</label>
+                <input type="file" class="form-control" id="imageFile" name="imageFile" accept="image/*">
             </div>
             <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-lg font-semibold">Submit</button>
         </form>
