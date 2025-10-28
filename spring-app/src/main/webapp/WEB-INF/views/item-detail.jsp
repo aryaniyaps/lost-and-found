@@ -41,12 +41,14 @@
             });
             const item = await res.json();
             const typeColor = item.type === 'LOST' ? 'bg-red-100 text-red-800' : 'bg-green-100 text-green-800';
+            const imageHtml = item.imageUrl ? '<img src="/uploads/' + item.imageUrl + '" alt="' + item.title + '" class="w-full max-w-md rounded-lg mb-4">' : '';
             document.getElementById('itemDetail').innerHTML = 
                 '<h1 class="text-3xl font-bold mb-4">' + item.title + '</h1>' +
                 '<div class="flex gap-2 mb-4">' +
                     '<span class="px-3 py-1 rounded-full text-sm font-semibold ' + typeColor + '">' + item.type + '</span>' +
                     '<span class="px-3 py-1 rounded-full text-sm font-semibold bg-blue-100 text-blue-800">' + item.status + '</span>' +
                 '</div>' +
+                imageHtml +
                 '<p class="text-gray-700 mb-4">' + (item.description || 'No description') + '</p>' +
                 '<div class="grid grid-cols-2 gap-4 text-sm">' +
                     '<p><span class="font-semibold">Category:</span> ' + item.category + '</p>' +

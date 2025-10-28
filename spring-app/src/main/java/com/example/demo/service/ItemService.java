@@ -18,7 +18,7 @@ public class ItemService {
     }
 
     public Item createItem(String email, String title, String description, String category, 
-                          Item.ItemType type, String location) {
+                          Item.ItemType type, String location, String imageUrl) {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("User not found"));
         Item item = new Item();
@@ -27,6 +27,7 @@ public class ItemService {
         item.setCategory(category);
         item.setType(type);
         item.setLocation(location);
+        item.setImageUrl(imageUrl);
         item.setStatus(Item.ItemStatus.ACTIVE);
         item.setUser(user);
         return itemRepository.save(item);

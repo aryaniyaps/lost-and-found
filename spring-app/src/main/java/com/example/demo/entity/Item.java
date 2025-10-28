@@ -29,6 +29,8 @@ public class Item {
 
     private String location;
 
+    private String imageUrl;
+
     private LocalDateTime dateReported = LocalDateTime.now();
 
     @ManyToOne
@@ -61,6 +63,9 @@ public class Item {
 
     public LocalDateTime getDateReported() { return dateReported; }
     public void setDateReported(LocalDateTime dateReported) { this.dateReported = dateReported; }
+
+    public String getImageUrl() { return imageUrl; }
+    public void setImageUrl(String imageUrl) { this.imageUrl = imageUrl; }
 
     public User getUser() { return user; }
     public void setUser(User user) { this.user = user; }

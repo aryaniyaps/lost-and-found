@@ -80,7 +80,9 @@
             document.getElementById('items').innerHTML = items.map(item => {
                 const borderColor = item.type === 'LOST' ? 'border-red-500' : 'border-green-500';
                 const typeColor = item.type === 'LOST' ? 'bg-red-100 text-red-800' : 'bg-green-100 text-green-800';
+                const imageHtml = item.imageUrl ? '<img src="/uploads/' + item.imageUrl + '" alt="' + item.title + '" class="w-full h-48 object-cover rounded-lg mb-3">' : '';
                 return '<div class="bg-white rounded-lg shadow-md p-6 border-l-4 ' + borderColor + ' cursor-pointer hover:shadow-lg" onclick="window.location.href=\'/items/' + item.id + '\'">' +
+                    imageHtml +
                     '<h3 class="text-xl font-bold text-gray-900 mb-2">' + item.title + '</h3>' +
                     '<p class="text-gray-600 mb-4">' + (item.description || 'No description') + '</p>' +
                     '<div class="space-y-2 text-sm">' +

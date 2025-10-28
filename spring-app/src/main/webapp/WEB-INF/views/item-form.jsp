@@ -48,9 +48,10 @@
                 <input type="text" name="location" placeholder="Location" 
                     class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
             </div>
-            <div class="form-group">
-                <label for="imageFile">Upload Image:</label>
-                <input type="file" class="form-control" id="imageFile" name="imageFile" accept="image/*">
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Upload Image (optional)</label>
+                <input type="file" name="imageFile" accept="image/*" 
+                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
             </div>
             <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-lg font-semibold">Submit</button>
         </form>
@@ -62,14 +63,12 @@
         document.getElementById('itemForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             const formData = new FormData(e.target);
-            const data = Object.fromEntries(formData);
             const res = await fetch('/api/items', {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json',
                     'Authorization': 'Bearer ' + localStorage.getItem('token')
                 },
-                body: JSON.stringify(data)
+                body: formData
             });
             if (res.ok) {
                 window.location.href = '/items';
