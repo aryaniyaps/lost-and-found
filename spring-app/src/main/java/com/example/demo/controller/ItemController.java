@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -60,14 +61,33 @@ public class ItemController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Item> getItem(@PathVariable Long id) {
-        return ResponseEntity.ok(itemService.getItemById(id));
+    public ResponseEntity<Map<String, Object>> getItem(@PathVariable Long id, Authentication auth) {
+        Item item = itemService.getItemById(id);
+        boolean isOwner = auth != null && item.getUser().getEmail().equals(auth.getName());
+        Map<String, Object> userMap = Map.of("email", item.getUser().getEmail(), "name", item.getUser().getName());
+        Map<String, Object> response = new HashMap<>();
+        response.put("id", item.getId());
+        response.put("title", item.getTitle());
+        response.put("description", item.getDescription());
+        response.put("category", item.getCategory());
+        response.put("status", item.getStatus());
+        response.put("type", item.getType());
+        response.put("location", item.getLocation());
+        response.put("dateReported", item.getDateReported());
+        response.put("imageUrl", item.getImageUrl());
+        response.put("user", userMap);
+        response.put("isOwner", isOwner);
+        return ResponseEntity.ok(response);
     }
 
     @PatchMapping("/{id}/status")
-    public ResponseEntity<Item> updateStatus(@PathVariable Long id, @RequestBody Map<String, String> request) {
+    public ResponseEntity<Item> updateStatus(@PathVariable Long id, @RequestBody Map<String, String> request,
+            Authentication auth) {
+        if (auth == null) {
+            return ResponseEntity.status(401).build();
+        }
         Item.ItemStatus status = Item.ItemStatus.valueOf(request.get("status"));
-        return ResponseEntity.ok(itemService.updateItemStatus(id, status));
+        return ResponseEntity.ok(itemService.updateItemStatus(id, status, auth.getName()));
     }
 
     @DeleteMapping("/{id}")

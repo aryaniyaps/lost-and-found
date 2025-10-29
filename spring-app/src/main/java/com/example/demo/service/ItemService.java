@@ -17,8 +17,8 @@ public class ItemService {
         this.userRepository = userRepository;
     }
 
-    public Item createItem(String email, String title, String description, String category, 
-                          Item.ItemType type, String location, String imageUrl) {
+    public Item createItem(String email, String title, String description, String category,
+            Item.ItemType type, String location, String imageUrl) {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("User not found"));
         Item item = new Item();
@@ -34,11 +34,13 @@ public class ItemService {
     }
 
     public List<Item> getAllItems() {
-        return itemRepository.findAll();
+        return itemRepository.findByStatus(Item.ItemStatus.ACTIVE);
     }
 
     public List<Item> getItemsByType(Item.ItemType type) {
-        return itemRepository.findByType(type);
+        return itemRepository.findByType(type).stream()
+                .filter(item -> item.getStatus() == Item.ItemStatus.ACTIVE)
+                .toList();
     }
 
     public Item getItemById(Long id) {
@@ -46,8 +48,11 @@ public class ItemService {
                 .orElseThrow(() -> new RuntimeException("Item not found"));
     }
 
-    public Item updateItemStatus(Long id, Item.ItemStatus status) {
+    public Item updateItemStatus(Long id, Item.ItemStatus status, String userEmail) {
         Item item = getItemById(id);
+        if (!item.getUser().getEmail().equals(userEmail)) {
+            throw new RuntimeException("Only the owner can update the item status");
+        }
         item.setStatus(status);
         return itemRepository.save(item);
     }

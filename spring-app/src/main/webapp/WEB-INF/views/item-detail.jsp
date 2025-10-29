@@ -42,7 +42,8 @@
             const item = await res.json();
             const typeColor = item.type === 'LOST' ? 'bg-red-100 text-red-800' : 'bg-green-100 text-green-800';
             const imageHtml = item.imageUrl ? '<img src="/uploads/' + item.imageUrl + '" alt="' + item.title + '" class="w-full max-w-md rounded-lg mb-4">' : '';
-            document.getElementById('itemDetail').innerHTML = 
+            const removeButton = item.isOwner && item.status === 'ACTIVE' ? '<button onclick="removeItem()" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg font-semibold">Remove Item</button>' : '';
+            document.getElementById('itemDetail').innerHTML =
                 '<h1 class="text-3xl font-bold mb-4">' + item.title + '</h1>' +
                 '<div class="flex gap-2 mb-4">' +
                     '<span class="px-3 py-1 rounded-full text-sm font-semibold ' + typeColor + '">' + item.type + '</span>' +
@@ -53,7 +54,8 @@
                 '<div class="grid grid-cols-2 gap-4 text-sm">' +
                     '<p><span class="font-semibold">Category:</span> ' + item.category + '</p>' +
                     '<p><span class="font-semibold">Location:</span> ' + (item.location || 'N/A') + '</p>' +
-                '</div>';
+                '</div>' +
+                '<div class="mt-4">' + removeButton + '</div>';
             loadMatches();
         }
         async function loadMatches() {
@@ -92,6 +94,15 @@
             });
             document.getElementById('commentInput').value = '';
             loadComments();
+        }
+        async function removeItem() {
+            if (!confirm('Are you sure you want to remove this item?')) return;
+            await fetch('/api/items/' + itemId + '/status', {
+                method: 'PATCH',
+                headers: {'Authorization': 'Bearer ' + localStorage.getItem('token'), 'Content-Type': 'application/json'},
+                body: JSON.stringify({status: 'CLOSED'})
+            });
+            window.location.reload();
         }
         loadItem();
         loadComments();
