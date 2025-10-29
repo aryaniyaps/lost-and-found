@@ -2,6 +2,8 @@ package com.example.demo.controller;
 
 import com.example.demo.dto.ItemRequest;
 import com.example.demo.entity.Item;
+import com.example.demo.entity.ItemLink;
+import com.example.demo.repository.ItemLinkRepository;
 import com.example.demo.service.FileStorageService;
 import com.example.demo.service.ItemService;
 import jakarta.validation.Valid;
@@ -18,10 +20,13 @@ import java.util.Map;
 public class ItemController {
     private final ItemService itemService;
     private final FileStorageService fileStorageService;
+    private final ItemLinkRepository itemLinkRepository;
 
-    public ItemController(ItemService itemService, FileStorageService fileStorageService) {
+    public ItemController(ItemService itemService, FileStorageService fileStorageService,
+            ItemLinkRepository itemLinkRepository) {
         this.itemService = itemService;
         this.fileStorageService = fileStorageService;
+        this.itemLinkRepository = itemLinkRepository;
     }
 
     @PostMapping
@@ -109,5 +114,21 @@ public class ItemController {
     @GetMapping("/{id}/matches")
     public ResponseEntity<List<Item>> findMatches(@PathVariable Long id) {
         return ResponseEntity.ok(itemService.findMatches(id));
+    }
+
+    @GetMapping("/{id}/links")
+    public ResponseEntity<List<Map<String, Object>>> getItemLinks(@PathVariable Long id) {
+        List<ItemLink> links = itemLinkRepository.findByLostItemId(id);
+        List<Map<String, Object>> linkData = links.stream().map(link -> {
+            Map<String, Object> data = new HashMap<>();
+            data.put("id", link.getId());
+            data.put("lostItemId", link.getLostItem().getId());
+            data.put("foundItemId", link.getFoundItem().getId());
+            data.put("foundItemTitle", link.getFoundItem().getTitle());
+            data.put("foundItemUser", link.getFoundItem().getUser().getName());
+            data.put("linkedAt", link.getLinkedAt());
+            return data;
+        }).toList();
+        return ResponseEntity.ok(linkData);
     }
 }

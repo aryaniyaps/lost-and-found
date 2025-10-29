@@ -1,7 +1,9 @@
 package com.example.demo.service;
 
 import com.example.demo.entity.Item;
+import com.example.demo.entity.ItemLink;
 import com.example.demo.entity.User;
+import com.example.demo.repository.ItemLinkRepository;
 import com.example.demo.repository.ItemRepository;
 import com.example.demo.repository.UserRepository;
 import org.springframework.stereotype.Service;
@@ -11,10 +13,15 @@ import java.util.List;
 public class ItemService {
     private final ItemRepository itemRepository;
     private final UserRepository userRepository;
+    private final ItemLinkRepository itemLinkRepository;
+    private final EmailService emailService;
 
-    public ItemService(ItemRepository itemRepository, UserRepository userRepository) {
+    public ItemService(ItemRepository itemRepository, UserRepository userRepository,
+            ItemLinkRepository itemLinkRepository, EmailService emailService) {
         this.itemRepository = itemRepository;
         this.userRepository = userRepository;
+        this.itemLinkRepository = itemLinkRepository;
+        this.emailService = emailService;
     }
 
     public Item createItem(String email, String title, String description, String category,
@@ -30,7 +37,27 @@ public class ItemService {
         item.setImageUrl(imageUrl);
         item.setStatus(Item.ItemStatus.ACTIVE);
         item.setUser(user);
-        return itemRepository.save(item);
+        Item savedItem = itemRepository.save(item);
+
+        // Check for matches if it's a FOUND item
+        if (type == Item.ItemType.FOUND) {
+            List<Item> potentialMatches = itemRepository.findPotentialMatches(Item.ItemType.LOST, category, title);
+            for (Item lostItem : potentialMatches) {
+                if (lostItem.getStatus() == Item.ItemStatus.ACTIVE) {
+                    // Create link
+                    ItemLink link = new ItemLink();
+                    link.setLostItem(lostItem);
+                    link.setFoundItem(savedItem);
+                    itemLinkRepository.save(link);
+
+                    // Send email notification
+                    emailService.sendItemMatchNotification(lostItem.getUser().getEmail(), lostItem.getTitle(), "LOST",
+                            user.getName());
+                }
+            }
+        }
+
+        return savedItem;
     }
 
     public List<Item> getAllItems() {

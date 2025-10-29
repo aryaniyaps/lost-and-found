@@ -23,6 +23,7 @@
     <div class="max-w-4xl mx-auto px-4 py-8">
         <div id="itemDetail" class="bg-white rounded-lg shadow-lg p-8 mb-6"></div>
         <div id="matches" class="mb-6"></div>
+        <div id="links" class="mb-6"></div>
         <div class="bg-white rounded-lg shadow-lg p-8">
             <h2 class="text-2xl font-bold mb-4">Comments</h2>
             <div class="mb-6">
@@ -57,6 +58,7 @@
                 '</div>' +
                 '<div class="mt-4">' + removeButton + '</div>';
             loadMatches();
+            loadLinks();
         }
         async function loadMatches() {
             const res = await fetch('/api/items/' + itemId + '/matches', {
@@ -64,11 +66,25 @@
             });
             const matches = await res.json();
             if (matches.length > 0) {
-                document.getElementById('matches').innerHTML = 
+                document.getElementById('matches').innerHTML =
                     '<div class="bg-yellow-50 border border-yellow-200 rounded-lg p-6">' +
                     '<h3 class="text-xl font-bold mb-3">Potential Matches</h3>' +
-                    '<div class="space-y-2">' + matches.map(m => 
+                    '<div class="space-y-2">' + matches.map(m =>
                         '<div class="bg-white p-3 rounded"><a href="/items/' + m.id + '" class="text-blue-600 hover:underline font-semibold">' + m.title + '</a><p class="text-sm text-gray-600">' + m.category + ' - ' + (m.location || 'N/A') + '</p></div>'
+                    ).join('') + '</div></div>';
+            }
+        }
+        async function loadLinks() {
+            const res = await fetch('/api/items/' + itemId + '/links', {
+                headers: {'Authorization': 'Bearer ' + localStorage.getItem('token')}
+            });
+            const links = await res.json();
+            if (links.length > 0) {
+                document.getElementById('links').innerHTML =
+                    '<div class="bg-green-50 border border-green-200 rounded-lg p-6">' +
+                    '<h3 class="text-xl font-bold mb-3">Linked Items</h3>' +
+                    '<div class="space-y-2">' + links.map(l =>
+                        '<div class="bg-white p-3 rounded"><a href="/items/' + l.foundItemId + '" class="text-green-600 hover:underline font-semibold">' + l.foundItemTitle + '</a><p class="text-sm text-gray-600">Found by ' + l.foundItemUser + ' on ' + new Date(l.linkedAt).toLocaleString() + '</p></div>'
                     ).join('') + '</div></div>';
             }
         }
