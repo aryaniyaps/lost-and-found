@@ -31,22 +31,53 @@
     <script>
         if (!localStorage.getItem('token')) window.location.href = '/login';
         async function loadDashboard() {
-            const res = await fetch('/api/dashboard/stats', {
-                headers: {'Authorization': 'Bearer ' + localStorage.getItem('token')}
-            });
-            const data = await res.json();
+            try {
+                const res = await fetch('/api/dashboard/stats', {
+                    headers: {'Authorization': 'Bearer ' + localStorage.getItem('token')}
+                });
+                if (!res.ok) {
+                    console.error('Failed to load dashboard stats', res.status);
+                    renderStats({});
+                    renderRecent([]);
+                    return;
+                }
+                const data = await res.json();
+                renderStats(data);
+                renderRecent(Array.isArray(data.recentItems) ? data.recentItems : []);
+            } catch (err) {
+                console.error('Error loading dashboard:', err);
+                renderStats({});
+                renderRecent([]);
+            }
+        }
+
+        function renderStats(data) {
+            const totalItems = data.totalItems ?? 0;
+            const activeItems = data.activeItems ?? 0;
+            const claimedItems = data.claimedItems ?? 0;
+            const totalComplaints = data.totalComplaints ?? 0;
             document.getElementById('stats').innerHTML = 
-                '<div class="bg-blue-500 text-white rounded-lg p-6"><h3 class="text-3xl font-bold">' + data.totalItems + '</h3><p>Total Items</p></div>' +
-                '<div class="bg-green-500 text-white rounded-lg p-6"><h3 class="text-3xl font-bold">' + data.activeItems + '</h3><p>Active Items</p></div>' +
-                '<div class="bg-yellow-500 text-white rounded-lg p-6"><h3 class="text-3xl font-bold">' + data.claimedItems + '</h3><p>Claimed Items</p></div>' +
-                '<div class="bg-purple-500 text-white rounded-lg p-6"><h3 class="text-3xl font-bold">' + data.totalComplaints + '</h3><p>Total Complaints</p></div>';
-            document.getElementById('recentItems').innerHTML = data.recentItems.map(item => {
-                const typeColor = item.type === 'LOST' ? 'text-red-600' : 'text-green-600';
+                '<div class="bg-blue-500 text-white rounded-lg p-6"><h3 class="text-3xl font-bold">' + totalItems + '</h3><p>Total Items</p></div>' +
+                '<div class="bg-green-500 text-white rounded-lg p-6"><h3 class="text-3xl font-bold">' + activeItems + '</h3><p>Active Items</p></div>' +
+                '<div class="bg-yellow-500 text-white rounded-lg p-6"><h3 class="text-3xl font-bold">' + claimedItems + '</h3><p>Claimed Items</p></div>' +
+                '<div class="bg-purple-500 text-white rounded-lg p-6"><h3 class="text-3xl font-bold">' + totalComplaints + '</h3><p>Total Complaints</p></div>';
+        }
+
+        function renderRecent(items) {
+            if (!items || items.length === 0) {
+                document.getElementById('recentItems').innerHTML = '<p class="text-gray-500">No items yet</p>';
+                return;
+            }
+            document.getElementById('recentItems').innerHTML = items.map(item => {
+                const type = item.type || 'N/A';
+                const category = item.category || 'N/A';
+                const title = item.title || item.name || 'Untitled';
+                const typeColor = type === 'LOST' ? 'text-red-600' : 'text-green-600';
                 return '<div class="border-l-4 border-blue-500 pl-4 py-2">' +
-                    '<a href="/items/' + item.id + '" class="font-semibold text-lg hover:text-blue-600">' + item.title + '</a>' +
-                    '<p class="text-sm text-gray-600"><span class="' + typeColor + ' font-semibold">' + item.type + '</span> - ' + item.category + '</p>' +
+                    '<a href="/items/' + (item.id ?? '') + '" class="font-semibold text-lg hover:text-blue-600">' + title + '</a>' +
+                    '<p class="text-sm text-gray-600"><span class="' + typeColor + ' font-semibold">' + type + '</span> - ' + category + '</p>' +
                     '</div>';
-            }).join('') || '<p class="text-gray-500">No items yet</p>';
+            }).join('');
         }
         loadDashboard();
         function logout() {

@@ -1,13 +1,18 @@
 package com.example.demo.controller;
 
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import java.util.ArrayList;
 
 @Controller
 public class ViewController {
-    
+
     @GetMapping("/")
-    public String home() {
+    public String home(Model model) {
+        // Here you would typically inject and use your ItemService to get recent items
+        // For now, we'll use an empty list which will be replaced with actual data
+        model.addAttribute("reports", new ArrayList<>());
         return "index";
     }
 

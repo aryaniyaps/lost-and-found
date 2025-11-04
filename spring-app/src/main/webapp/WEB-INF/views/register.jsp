@@ -30,21 +30,36 @@
         <p class="mt-4 text-center text-gray-600">Already have an account? <a href="/login" class="text-green-600 hover:underline">Login</a></p>
     </div>
     <script>
-        document.getElementById('registerForm').addEventListener('submit', async (e) => {
+        const registerForm = document.getElementById('registerForm');
+        const showError = (msg) => alert(msg || 'Registration failed');
+
+        registerForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             const formData = new FormData(e.target);
             const data = Object.fromEntries(formData);
-            const res = await fetch('/api/auth/register', {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify(data)
-            });
-            if (res.ok) {
-                const {token} = await res.json();
-                localStorage.setItem('token', token);
-                window.location.href = '/items';
-            } else {
-                alert('Registration failed');
+
+            // Basic client-side validation
+            if (!data.email || !data.password || !data.name) {
+                showError('Name, email and password are required');
+                return;
+            }
+
+            try {
+                const res = await fetch('/api/auth/register', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify(data)
+                });
+                const body = await res.json().catch(() => ({}));
+                if (res.ok && body.token) {
+                    localStorage.setItem('token', body.token);
+                    window.location.href = '/items';
+                } else {
+                    showError(body.error || 'Registration failed');
+                }
+            } catch (err) {
+                console.error('Registration error', err);
+                showError('Network error. Please try again.');
             }
         });
     </script>

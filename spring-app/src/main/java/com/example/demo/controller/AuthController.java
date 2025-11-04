@@ -18,15 +18,23 @@ public class AuthController {
 
     @PostMapping("/register")
     public ResponseEntity<?> register(@Valid @RequestBody AuthRequest request) {
-        String token = authService.register(request.getEmail(), request.getPassword(), 
-                                           request.getName(), request.getPhone());
-        return ResponseEntity.ok(Map.of("token", token));
+        try {
+            String token = authService.register(request.getEmail(), request.getPassword(),
+                    request.getName(), request.getPhone());
+            return ResponseEntity.ok(Map.of("token", token));
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+        }
     }
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@Valid @RequestBody AuthRequest request) {
-        String token = authService.login(request.getEmail(), request.getPassword());
-        return ResponseEntity.ok(Map.of("token", token));
+        try {
+            String token = authService.login(request.getEmail(), request.getPassword());
+            return ResponseEntity.ok(Map.of("token", token));
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(401).body(Map.of("error", e.getMessage()));
+        }
     }
 
     @PostMapping("/forgot-password")

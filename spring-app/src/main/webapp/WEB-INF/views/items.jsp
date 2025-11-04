@@ -50,7 +50,7 @@
         let currentType = null;
         async function loadItems(type) {
             currentType = type;
-            const url = type ? '/api/items?type=' + type : '/api/items';
+            const url = type ? '/api/items?type=' + encodeURIComponent(type) : '/api/items';
             const res = await fetch(url, {
                 headers: {'Authorization': 'Bearer ' + localStorage.getItem('token')}
             });
@@ -76,12 +76,49 @@
             const items = await res.json();
             displayItems(items);
         }
+
+        // Read URL query params on load to support links like /items?category=Electronics
+        function applyUrlFiltersOnLoad() {
+            const params = new URLSearchParams(window.location.search);
+            const category = params.get('category');
+            const search = params.get('search') || params.get('q');
+            const type = params.get('type');
+
+            if (category) {
+                // set select value for UX
+                const sel = document.getElementById('categoryFilter');
+                if (sel) sel.value = category;
+                // fetch filtered items
+                fetch('/api/items/filter?category=' + encodeURIComponent(category), {
+                    headers: {'Authorization': 'Bearer ' + localStorage.getItem('token')}
+                }).then(res => res.ok ? res.json() : []).then(items => displayItems(items)).catch(err => console.error(err));
+                return;
+            }
+
+            if (search) {
+                // populate search box
+                const si = document.getElementById('searchInput');
+                if (si) si.value = search;
+                fetch('/api/items/search?q=' + encodeURIComponent(search), {
+                    headers: {'Authorization': 'Bearer ' + localStorage.getItem('token')}
+                }).then(res => res.ok ? res.json() : []).then(items => displayItems(items)).catch(err => console.error(err));
+                return;
+            }
+
+            if (type) {
+                loadItems(type);
+                return;
+            }
+
+            // default
+            loadItems();
+        }
         function displayItems(items) {
             document.getElementById('items').innerHTML = items.map(item => {
                 const borderColor = item.type === 'LOST' ? 'border-red-500' : 'border-green-500';
                 const typeColor = item.type === 'LOST' ? 'bg-red-100 text-red-800' : 'bg-green-100 text-green-800';
                 const imageHtml = item.imageUrl ? '<img src="/uploads/' + item.imageUrl + '" alt="' + item.title + '" class="w-full h-48 object-cover rounded-lg mb-3">' : '';
-                return '<div class="bg-white rounded-lg shadow-md p-6 border-l-4 ' + borderColor + ' cursor-pointer hover:shadow-lg" onclick="window.location.href=\'/items/' + item.id + '\'">' +
+                return '<div class="bg-white rounded-lg shadow-md p-6 border-l-4 ' + borderColor + ' cursor-pointer transform transition duration-200 hover:shadow-xl hover:scale-105 hover:border-l-8" onclick="window.location.href=\'/items/' + item.id + '\'">' +
                     imageHtml +
                     '<h3 class="text-xl font-bold text-gray-900 mb-2">' + item.title + '</h3>' +
                     '<p class="text-gray-600 mb-4">' + (item.description || 'No description') + '</p>' +
@@ -96,7 +133,7 @@
                 '</div>';
             }).join('');
         }
-        loadItems();
+    applyUrlFiltersOnLoad();
         function logout() {
             localStorage.removeItem('token');
             window.location.href = '/login';

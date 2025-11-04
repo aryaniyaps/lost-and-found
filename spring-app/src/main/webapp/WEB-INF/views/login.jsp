@@ -22,21 +22,36 @@
         <p class="mt-4 text-center text-gray-600">Don't have an account? <a href="/register" class="text-blue-600 hover:underline">Register</a></p>
     </div>
     <script>
-        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+        const loginForm = document.getElementById('loginForm');
+        const showError = (msg) => alert(msg || 'Login failed');
+
+        loginForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             const formData = new FormData(e.target);
             const data = Object.fromEntries(formData);
-            const res = await fetch('/api/auth/login', {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify(data)
-            });
-            if (res.ok) {
-                const {token} = await res.json();
-                localStorage.setItem('token', token);
-                window.location.href = '/items';
-            } else {
-                alert('Login failed');
+
+            // Basic client-side validation
+            if (!data.email || !data.password) {
+                showError('Please enter email and password');
+                return;
+            }
+
+            try {
+                const res = await fetch('/api/auth/login', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify(data)
+                });
+                const body = await res.json().catch(() => ({}));
+                if (res.ok && body.token) {
+                    localStorage.setItem('token', body.token);
+                    window.location.href = '/items';
+                } else {
+                    showError(body.error || 'Login failed');
+                }
+            } catch (err) {
+                console.error('Login error', err);
+                showError('Network error. Please try again.');
             }
         });
     </script>
